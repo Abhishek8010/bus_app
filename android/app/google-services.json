@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "789414407702",
+    "project_id": "busapp-a300a",
+    "storage_bucket": "busapp-a300a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:789414407702:android:299819390bd4b84505cf37",
+        "android_client_info": {
+          "package_name": "com.example.bus_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHDsndnVWiXidv8cwk8DQ8HcYrxDequn0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
