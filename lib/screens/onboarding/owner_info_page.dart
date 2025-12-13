@@ -218,7 +218,7 @@ class OwnerInfoPage extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              Navigator.pushNamed(context, "/login-selection");
+              Navigator.pushNamed(context,'/login-selection');
             },
             child: const Text("Continue"),
           ),

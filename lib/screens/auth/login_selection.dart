@@ -1,4 +1,3 @@
-import 'package:bus_app/app/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_app/screens/auth/admin_login.dart';
 import 'parent_otp_login.dart';

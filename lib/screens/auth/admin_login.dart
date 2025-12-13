@@ -37,14 +37,14 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
          const SnackBar(content: Text("Admin login successful")),
        );
 
-      // Navigate to Admin Dashboard (create later)
-      // Navigator.push(context, MaterialPageRoute(builder: (_) => AdminDashboard()));
 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
       );
     }
+
+    //this block will execute compulsorily. therefore after we get value of user through future, we state loading = false
     finally{
     setState(() => loading = false);
 
