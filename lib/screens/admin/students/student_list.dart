@@ -125,6 +125,7 @@ class StudentCard extends StatelessWidget {
             Text('Parent: $parentName'),
             Text('Phone: $parentPhone'),
             Text('Bus: ${busId.isEmpty ? "Not Assigned" : busId}'),
+            
           ],
         ),
 

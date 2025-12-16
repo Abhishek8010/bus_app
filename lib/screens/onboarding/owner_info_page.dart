@@ -44,14 +44,11 @@ class OwnerInfoPage extends StatelessWidget {
                 child: Column(
                   children: [
                     CircleAvatar(
-                      radius: 48,
-                      backgroundColor: colorScheme.primary.withOpacity(0.2),
-                      child: Icon(
-                        Icons.person,
-                        size: 48,
-                        color: colorScheme.primary,
-                      ),
+                      radius: 48, // 48 radius → 96 diameter
+                      backgroundImage: AssetImage('img.jpg'),
+                      backgroundColor: Colors.grey.shade200,
                     ),
+
                     const SizedBox(height: 12),
                     Text(
                       "Mr. Suresh Adhav",

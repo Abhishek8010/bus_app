@@ -110,7 +110,7 @@ class StudentDetailsPage extends StatelessWidget {
     required String value,
   }) {
     return Card(
-      elevation: 3,
+      elevation: 1,
       margin: const EdgeInsets.only(bottom: 12),
 
       child: ListTile(
