@@ -44,36 +44,53 @@ class AuthService {
 
 
     // ---------------- CHECK USER ROLE ----------------(for parent otp login)
-    /*
-      Checks whether a user document exists in Firestore
-      users/{uid}
+      String? _verificationId;
 
-      Used after OTP login to detect:
-      - First time login
-      - Existing user
-    */
-    Future<bool> userExists(String uid) async {
-      final doc = await _firestore.collection('users').doc(uid).get();
-      return doc.exists;
+      // STEP 1: Send OTP
+      Future<void> sendOtp({
+        required String phoneNumber,
+        required Function(String) onCodeSent,
+        required Function(String) onError,
+      }) async {
+        await _auth.verifyPhoneNumber(
+          phoneNumber: phoneNumber,
+          timeout: const Duration(seconds: 60),
+
+          verificationCompleted: (PhoneAuthCredential credential) async {
+            // Auto verification (rare but possible)
+            await _auth.signInWithCredential(credential);
+          },
+
+          verificationFailed: (FirebaseAuthException e) {
+            onError(e.message ?? "OTP verification failed");
+          },
+
+          codeSent: (String verificationId, int? resendToken) {
+            _verificationId = verificationId;
+            onCodeSent(verificationId);
+          },
+
+          codeAutoRetrievalTimeout: (String verificationId) {
+            _verificationId = verificationId;
+          },
+        );
+      }
+
+      // STEP 2: Verify OTP
+      Future<UserCredential> verifyOtp(String smsCode) async {
+        final credential = PhoneAuthProvider.credential(
+          verificationId: _verificationId!,
+          smsCode: smsCode,
+        );
+
+        return await _auth.signInWithCredential(credential);
+      }
+
+      // Sign out (used when unauthorized)
+      Future<void> signOut() async {
+        await _auth.signOut();
+      }
     }
-
-    /*
-      Fetches the role field from Firestore
-
-      Possible values:
-      - "admin"
-      - "parent"
-
-      Returns null if document doesn't exist
-    */
-    Future<String?> getUserRole(String uid) async {
-      final doc = await _firestore.collection('users').doc(uid).get();
-
-      if (!doc.exists) return null;
-
-      return doc.data()?['role'];
-    }
-}
 
 
 

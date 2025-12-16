@@ -1,28 +1,4 @@
 
-// import 'package:flutter/material.dart';
-
-// class AdminDashboard extends StatefulWidget {
-//   const AdminDashboard({super.key});
-
-//   @override
-//   State<AdminDashboard> createState() => _AdminDashboardState();
-// }
-
-// class _AdminDashboardState extends State<AdminDashboard> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-
-//       appBar: AppBar(
-//         title: Text('Welcome to Admin Dashboard'),
-//       ),
-      
-//     );
-//   }
-// }
-
-
-
 
 
 import 'package:flutter/material.dart';
@@ -38,7 +14,7 @@ class AdminDashboard extends StatelessWidget {
         title: "Students",
         icon: Icons.people_alt_rounded,
         color: Colors.blue,
-        route: "/students",
+        route: "/student-list",
       ),
       _DashboardItem(
         title: "Buses",

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bus_app/services/auth_service.dart';
+import 'package:bus_app/services/firestore_service.dart';
+import 'package:bus_app/app/routes/app_routes.dart';
+import 'package:bus_app/screens/auth/parent_otp_verification.dart';
 
 class ParentOtpLoginPage extends StatefulWidget {
   const ParentOtpLoginPage({super.key});
@@ -10,180 +13,132 @@ class ParentOtpLoginPage extends StatefulWidget {
 }
 
 class _ParentOtpLoginPageState extends State<ParentOtpLoginPage> {
+  final TextEditingController phoneController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  // Controllers for user input
-  final phoneController = TextEditingController();
-  final otpController = TextEditingController();
-
-  // Firebase verification id (received after OTP is sent)
-  String verificationId = '';
-
-  // UI state variables
-  bool otpSent = false;
   bool loading = false;
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // -------- TEMPORARY ACTION (NO LOGIC YET) --------
+  Future<void> sendOtp(BuildContext context, String phoneNumber) async {
+  setState(() => loading = true);
 
-  /*
-    ---------------- SEND OTP ----------------
+  await FirebaseAuth.instance.verifyPhoneNumber(
+    phoneNumber: '+91$phoneNumber',
+    timeout: const Duration(seconds: 60),
 
-    1. Takes phone number
-    2. Firebase sends OTP
-    3. Stores verificationId
-    4. Shows OTP field
-  */
-  Future<void> sendOtp() async {
-    setState(() => loading = true);
+    // 🔹 ANDROID: Auto verification
+    verificationCompleted: (PhoneAuthCredential credential) async {
+      await FirebaseAuth.instance.signInWithCredential(credential);
+    },
 
-    await _auth.verifyPhoneNumber(
-      phoneNumber: "+91${phoneController.text.trim()}",
-      timeout: const Duration(seconds: 60),
+    // 🔹 Error
+    verificationFailed: (FirebaseAuthException e) {
+      setState(() => loading = false);
 
-      // Automatic verification (rare, Android only)
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        await _auth.signInWithCredential(credential);
-      },
-
-      // OTP sending failed
-      verificationFailed: (FirebaseAuthException e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message ?? "OTP failed")),
-        );
-        setState(() => loading = false);
-      },
-
-      // OTP sent successfully
-      codeSent: (String verId, int? resendToken) {
-        verificationId = verId;
-        otpSent = true;
-        loading = false;
-        setState(() {});
-      },
-
-      codeAutoRetrievalTimeout: (String verId) {
-        verificationId = verId;
-      },
-    );
-  }
-
-  /*
-    ---------------- VERIFY OTP ----------------
-
-    Flow:
-    OTP → Firebase Auth → uid
-         ↓
-    Check Firestore users/{uid}
-         ↓
-    First time → Language selection
-    Existing parent → Parent home
-    Wrong role → Logout
-  */
-  Future<void> verifyOtp() async {
-    setState(() => loading = true);
-
-    try {
-      final credential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: otpController.text.trim(),
-      );
-
-      final userCredential =
-          await _auth.signInWithCredential(credential);
-
-      final uid = userCredential.user!.uid;
-
-      final authService = AuthService();
-
-      // Check if Firestore document exists
-      final exists = await authService.userExists(uid);
-
-      if (!exists) {
-        // First-time parent
-        Navigator.pushReplacementNamed(context, '/language-selection');
-        return;
-      }
-
-      // Check role
-      final role = await authService.getUserRole(uid);
-
-      if (role != 'parent') {
-        // Security block
-        await _auth.signOut();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Access denied")),
-        );
-        return;
-      }
-
-      // Valid parent
-      Navigator.pushReplacementNamed(context, '/parent-home');
-
-    } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? "Invalid OTP")),
+        SnackBar(content: Text(e.message ?? 'OTP failed')),
       );
-    }
-    finally{
-          setState(() => loading = false);
+    },
 
-    }
+    // 🔹 OTP sent
+    codeSent: (String verificationId, int? resendToken) {
+      setState(() => loading = false);
 
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ParentOtpVerificationPage(
+            phoneNumber: '+91$phoneNumber',
+            verificationId: verificationId,
+          ),
+        ),
+      );
+    },
+
+    // 🔹 Timeout
+    codeAutoRetrievalTimeout: (String verificationId) {},
+  );
+}
+
+
+  @override
+  void dispose() {
+    phoneController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Parent Login"),
+        title: const Text('Parent Login'),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
 
-            // Phone number input
-            if (!otpSent)
-              TextField(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+
+        child: Form(
+          key: _formKey,
+
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 40),
+
+              const Icon(
+                Icons.phone_android,
+                size: 80,
+                color: Colors.green,
+              ),
+
+              const SizedBox(height: 16),
+
+              const Text(
+                'Enter your registered mobile number',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+
+              const SizedBox(height: 32),
+
+              // ---------------- PHONE INPUT ----------------
+              TextFormField(
                 controller: phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
-                  labelText: "Phone Number",
-                  hintText: "10 digit mobile number",
-                  prefixText: "+91 ",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
-            // OTP input
-            if (otpSent)
-              TextField(
-                controller: otpController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: "OTP",
-                  border: OutlineInputBorder(),
+                maxLength: 10,
+                decoration: InputDecoration(
+                  labelText: 'Mobile Number',
+                  prefixText: '+91 ',
+                  prefixIcon: const Icon(Icons.phone),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  counterText: '',
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().length != 10) {
+                    return 'Enter valid 10 digit number';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 24),
+
+              // ---------------- SEND OTP BUTTON ----------------
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: loading ? null : () => sendOtp(context, phoneController.text),
+                  child: loading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('SEND OTP'),
                 ),
               ),
-
-            const SizedBox(height: 20),
-
-            // Send / Verify button
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: loading
-                    ? null
-                    : otpSent
-                        ? verifyOtp
-                        : sendOtp,
-                child: loading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text(otpSent ? "Verify OTP" : "Send OTP"),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
