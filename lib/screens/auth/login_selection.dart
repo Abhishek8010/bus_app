@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bus_app/screens/auth/admin_login.dart';
-import 'parent_otp_login.dart';
+import 'parent_email_login.dart';
 
 class LoginSelectionPage extends StatefulWidget {
   const LoginSelectionPage({super.key});
@@ -78,10 +78,10 @@ class _LoginSelectionPageState extends State<LoginSelectionPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => const ParentOtpLoginPage()),
+                          builder: (_) => const ParentEmailLoginPage()),
                     );
                   },
-                  child: const Text("Parent Login (OTP)"),
+                  child: const Text("Parent Login (Email)"),
                 ),
               ),
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 
 class AddStudentPage extends StatefulWidget {
@@ -18,6 +20,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
   final TextEditingController parentPhoneController = TextEditingController();
   final TextEditingController villageController = TextEditingController();
   final TextEditingController busIdController = TextEditingController();
+  final TextEditingController parentEmailController = TextEditingController();
 
   bool loading = false;
 
@@ -34,6 +37,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
         'name': studentNameController.text.trim(),
         'parentName': parentNameController.text.trim(),
         'parentPhone': '+91$phone', // IMPORTANT
+        'parentEmail': parentEmailController.text.trim(), // Placeholder for future email field
         'village': villageController.text.trim(),
         'busId': busIdController.text.trim(),
         'isActive': true,
@@ -43,6 +47,11 @@ class _AddStudentPageState extends State<AddStudentPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Student added successfully')),
       );
+      // await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      //   email: parentEmail,
+      //   password: "Temp@12345",
+      // );
+
 
       Navigator.pop(context);
     } catch (e) {
@@ -59,6 +68,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
     studentNameController.dispose();
     parentNameController.dispose();
     parentPhoneController.dispose();
+    parentEmailController.dispose();
     villageController.dispose();
     busIdController.dispose();
     super.dispose();
@@ -93,6 +103,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
               ),
 
               _buildPhoneInput(),
+              _buildEmailInput(),
 
               _buildInput(
                 controller: villageController,
@@ -176,6 +187,33 @@ class _AddStudentPageState extends State<AddStudentPage> {
         validator: (value) {
           if (value == null || value.length != 10) {
             return 'Enter valid 10 digit number';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+
+  // ---------------- EMAIL INPUT ----------------
+  Widget _buildEmailInput() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+
+      child: TextFormField(
+        controller: parentEmailController,
+        keyboardType: TextInputType.text,
+        decoration: InputDecoration(
+          labelText: 'Parent Email',
+          prefixIcon: const Icon(Icons.email),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          counterText: '',
+        ),
+        validator: (value) {
+          if (value == null || value.trim().isEmpty) {
+            return 'Enter Email Address';
           }
           return null;
         },

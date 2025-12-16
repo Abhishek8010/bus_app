@@ -74,6 +74,11 @@ class StudentDetailsPage extends StatelessWidget {
                   title: 'Parent Phone',
                   value: data['parentPhone'] ?? '',
                 ),
+                _infoCard(
+                  icon: Icons.email,
+                  title: 'Parent Email',
+                  value: data['parentEmail'] ?? '',
+                ),
 
                 _infoCard(
                   icon: Icons.location_on,

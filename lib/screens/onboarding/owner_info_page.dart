@@ -43,10 +43,19 @@ class OwnerInfoPage extends StatelessWidget {
               Center(
                 child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: 48, // 48 radius → 96 diameter
-                      backgroundImage: AssetImage('img.jpg'),
-                      backgroundColor: Colors.grey.shade200,
+                    // CircleAvatar(
+                    //   radius: 48, // 48 radius → 96 diameter
+                    //   backgroundImage: AssetImage('assets/images/dadaji.jpg'),
+                    //   backgroundColor: Colors.grey.shade200,
+                    // ),
+                    ClipOval(
+                      child: Image.asset(
+                        'assets/images/aaba_image.jpg',
+                        height: 96,
+                        width: 96,
+                        fit: BoxFit.cover,
+                        alignment: Alignment.topCenter,
+                      ),  
                     ),
 
                     const SizedBox(height: 12),

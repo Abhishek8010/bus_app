@@ -5,7 +5,7 @@ import 'package:bus_app/app/theme/app_theme.dart';
 import 'package:bus_app/screens/onboarding/owner_info_page.dart';
 import 'package:bus_app/screens/auth/admin_login.dart';
 import 'package:bus_app/screens/auth/login_selection.dart';
-import 'package:bus_app/screens/auth/parent_otp_login.dart';
+import 'package:bus_app/screens/auth/parent_email_login.dart';
 import 'package:bus_app/screens/admin/dashboard.dart';
 import 'package:bus_app/screens/parent/parent_home.dart';
 import 'package:bus_app/screens/admin/students/student_list.dart';
