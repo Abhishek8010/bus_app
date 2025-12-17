@@ -140,7 +140,7 @@ Future<void> handleParentAfterLogin(User user) async {
     // Collect student IDs
     final studentIds = studentQuery.docs.map((doc) => doc.id).toList();
 
-    // Create users document
+    // Create users document. As soon as we create login, we create user record in firestore for that parent
     await userDocRef.set({
       'name': studentQuery.docs.first['parentName'],
       'email': email,

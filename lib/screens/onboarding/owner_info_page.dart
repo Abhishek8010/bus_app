@@ -51,7 +51,7 @@ class OwnerInfoPage extends StatelessWidget {
                     // ),
                     ClipOval(
                       child: Image.asset(
-                        'assets/images/aaba_image.jpg',
+                        'assets/images/aaba_image1.jpg',
                         height: 96,
                         width: 96,
                         fit: BoxFit.cover,
@@ -61,7 +61,7 @@ class OwnerInfoPage extends StatelessWidget {
 
                     const SizedBox(height: 12),
                     Text(
-                      "Mr. Suresh Adhav",
+                      "Mr. Suresh K Adhav",
                       style: textTheme.headlineMedium,
                     ),
                     const SizedBox(height: 4),

@@ -46,7 +46,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
       'createdAt': Timestamp.now(),
     });
 
-    // 2️⃣ ENSURE PARENT EXISTS IN FIREBASE AUTH
+    // 2️⃣ ENSURE PARENT EXISTS IN FIREBASE AUTH. BECAUSE FOR SENDING EMAIL, PARENT MUST HAVE AUTH RECORD
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: parentEmail,
@@ -78,44 +78,6 @@ class _AddStudentPageState extends State<AddStudentPage> {
   }
 }
 
-
-  // Future<void> saveStudent() async {
-  //   if (!_formKey.currentState!.validate()) return;
-
-  //   setState(() => loading = true);
-
-  //   try {
-  //     final phone = parentPhoneController.text.trim();
-
-  //     await FirebaseFirestore.instance.collection('students').add({
-  //       'name': studentNameController.text.trim(),
-  //       'parentName': parentNameController.text.trim(),
-  //       'parentPhone': '+91$phone', // IMPORTANT
-  //       'parentEmail': parentEmailController.text.trim(), // Placeholder for future email field
-  //       'village': villageController.text.trim(),
-  //       'busId': busIdController.text.trim(),
-  //       'isActive': true,
-  //       'createdAt': Timestamp.now(),
-  //     });
-
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text('Student added successfully')),
-  //     );
-  //     // await FirebaseAuth.instance.createUserWithEmailAndPassword(
-  //     //   email: parentEmail,
-  //     //   password: "Temp@12345",
-  //     // );
-
-
-  //     Navigator.pop(context);
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Error: $e')),
-  //     );
-  //   } finally {
-  //     setState(() => loading = false);
-  //   }
-  // }
 
   @override
   void dispose() {
