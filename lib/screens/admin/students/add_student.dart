@@ -24,59 +24,108 @@ class _AddStudentPageState extends State<AddStudentPage> {
 
   bool loading = false;
 
-  // ---------------- SAVE STUDENT ----------------
- Future<void> saveStudent() async {
-  if (!_formKey.currentState!.validate()) return;
+// ---------------- SAVE STUDENT ----------------
+  Future<void> saveStudent() async {
+    if (!_formKey.currentState!.validate()) return;
 
-  setState(() => loading = true);
+    setState(() => loading = true);
 
-  try {
-    final phone = parentPhoneController.text.trim();
-    final parentEmail = parentEmailController.text.trim();
-
-    // 1️⃣ CREATE STUDENT FIRST
-    await FirebaseFirestore.instance.collection('students').add({
-      'name': studentNameController.text.trim(),
-      'parentName': parentNameController.text.trim(),
-      'parentPhone': '+91$phone',
-      'parentEmail': parentEmail,
-      'village': villageController.text.trim(),
-      'busId': busIdController.text.trim(),
-      'isActive': true,
-      'createdAt': Timestamp.now(),
-    });
-
-    // 2️⃣ ENSURE PARENT EXISTS IN FIREBASE AUTH. BECAUSE FOR SENDING EMAIL, PARENT MUST HAVE AUTH RECORD
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: parentEmail,
-        password: 'Temp@123', // temporary password
-      );
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-already-in-use') {
-        // ✅ Parent already exists → do nothing
-      } else {
-        rethrow; // real error
+      final phone = parentPhoneController.text.trim();
+      final parentEmail = parentEmailController.text.trim();
+
+      // 1️⃣ CREATE STUDENT FIRST (CAPTURE ID)
+      final studentRef =
+          await FirebaseFirestore.instance.collection('students').add({
+        'name': studentNameController.text.trim(),
+        'parentName': parentNameController.text.trim(),
+        'parentPhone': '+91$phone',
+        'parentEmail': parentEmail,
+        'village': villageController.text.trim(),
+        'busId': busIdController.text.trim(),
+        'isActive': true,
+        'createdAt': Timestamp.now(),
+      });
+
+      final String studentId = studentRef.id; // ✅ VERY IMPORTANT
+
+      // 2️⃣ ENSURE PARENT EXISTS IN FIREBASE AUTH
+      UserCredential? credential;
+
+      try {
+        credential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+          email: parentEmail,
+          password: 'Temp@123', // temporary password
+        );
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'email-already-in-use') {
+          // Parent already exists → fetch current user
+          credential = null;
+        } else {
+          rethrow;
+        }
       }
-    }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Student added successfully.\nParent should use "Forgot Password" to set password.',
+      // 3️⃣ GET PARENT UID (FROM AUTH OR FIRESTORE)
+      String parentUid;
+
+      if (credential != null) {
+        // New parent created
+        parentUid = credential.user!.uid;
+
+        // Create users document
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(parentUid)
+            .set({
+          'email': parentEmail,
+          'role': 'parent',
+          'studentIds': [studentId],
+          'createdAt': Timestamp.now(),
+        });
+      } else {
+        // Parent already exists → find Firestore user
+        final query = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: parentEmail)
+            .where('role', isEqualTo: 'parent')
+            .limit(1)
+            .get();
+
+        if (query.docs.isEmpty) {
+          throw Exception('Parent user record not found');
+        }
+
+        parentUid = query.docs.first.id;
+
+        // 4️⃣ APPEND STUDENT ID (CRITICAL FIX)
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(parentUid)
+            .update({
+          'studentIds': FieldValue.arrayUnion([studentId]),
+        });
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Student added successfully.\nParent should use "Forgot Password" to set password.',
+          ),
         ),
-      ),
-    );
+      );
 
-    Navigator.pop(context);
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error: $e')),
-    );
-  } finally {
-    setState(() => loading = false);
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      setState(() => loading = false);
+    }
   }
-}
+    
 
 
   @override

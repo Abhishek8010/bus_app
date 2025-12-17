@@ -1,6 +1,4 @@
-
-
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_app/app/routes/app_routes.dart';
 
@@ -67,6 +65,19 @@ class AdminDashboard extends StatelessWidget {
           "Admin Dashboard",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+         actions: [
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.pop(context);
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
