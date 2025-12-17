@@ -49,7 +49,8 @@ class _LoginSelectionPageState extends State<LoginSelectionPage> {
                         'assets/images/schoolbus.jpg',
                         height: 120,
                         width: 120, // Setting width equal to height ensures a perfect circle
-                        fit: BoxFit.contain, // Ensures the image covers the entire circle area
+                        fit: BoxFit.cover, // Ensures the image covers the entire circle area
+                        alignment: Alignment.topRight,
                       ),
                     ),
                     const SizedBox(height: 10),

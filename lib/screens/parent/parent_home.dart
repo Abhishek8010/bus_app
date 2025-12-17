@@ -15,6 +15,13 @@ class _ParentHomePageState extends State<ParentHomePage> {
       appBar: AppBar(
         title: Text('Welcome to Parent Home'),
       ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+         
+        ],
+      ),
 
     );
   }

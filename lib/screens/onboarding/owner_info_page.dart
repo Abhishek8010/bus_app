@@ -19,6 +19,7 @@ class OwnerInfoPage extends StatelessWidget {
                 child: Image.asset(
                   'assets/images/schoolbus.jpg',
                   fit: BoxFit.cover,
+                  alignment: Alignment.topRight,
                 ),
               ),
             ),
