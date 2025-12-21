@@ -18,7 +18,7 @@ class AdminDashboard extends StatelessWidget {
         title: "Buses",
         icon: Icons.directions_bus_filled_rounded,
         color: Colors.orange,
-        route: "/buses",
+        route: "/buses-list",
       ),
       _DashboardItem(
         title: "Drivers",

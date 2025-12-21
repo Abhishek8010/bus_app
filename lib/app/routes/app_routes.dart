@@ -12,6 +12,10 @@ import 'package:bus_app/screens/admin/students/student_list.dart';
 import 'package:bus_app/screens/admin/students/student_details.dart';
 import 'package:bus_app/screens/admin/students/add_student.dart';
 import 'package:bus_app/screens/admin/students/edit_student.dart';
+import 'package:bus_app/screens/admin/buses/bus_list.dart';
+import 'package:bus_app/screens/admin/buses/add_bus.dart';
+import 'package:bus_app/screens/admin/buses/bus_details.dart';
+import 'package:bus_app/screens/admin/buses/edit_bus.dart';
 
 
 
@@ -28,6 +32,11 @@ class AppRoutes {
   static const String studentDetails = '/student-details';
   static const String studentList = '/student-list';
   static const String editStudent = '/edit-student';
+  static const String buses = '/buses-list';
+  static const String addBus = '/add-bus';
+  static const String busDetails = '/bus-details';
+  static const String editBus = '/edit-bus';
+
 
 
   
@@ -49,6 +58,10 @@ class AppRoutes {
     studentList: (context) => const StudentListPage(),
     studentDetails: (context) => const StudentDetailsPage(),
     editStudent: (context) => const EditStudentPage(),
+    buses: (context) => const BusListPage(), // Replace with BusesPage when implemented
+    addBus: (context) => const AddBusPage(),
+    busDetails: (context) => const BusDetailsPage(),
+    editBus: (context) => const EditBusPage(),
 
 
 
