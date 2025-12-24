@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+
 
 
 
@@ -12,14 +14,22 @@ class AddStudentPage extends StatefulWidget {
 }
 
 class _AddStudentPageState extends State<AddStudentPage> {
+    final FirebaseAuth secondaryAuth = FirebaseAuth.instanceFor(
+      app: Firebase.app(),
+);
+
+
+    String? selectedBusId;
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController studentNameController = TextEditingController();
   final TextEditingController parentNameController = TextEditingController();
   final TextEditingController parentPhoneController = TextEditingController();
   final TextEditingController villageController = TextEditingController();
-  final TextEditingController busIdController = TextEditingController();
+
+
   final TextEditingController parentEmailController = TextEditingController();
+
 
   bool loading = false;
 
@@ -41,7 +51,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
         'parentPhone': '+91$phone',
         'parentEmail': parentEmail,
         'village': villageController.text.trim(),
-        'busId': busIdController.text.trim(),
+        'busId': selectedBusId,
         'isActive': true,
         'createdAt': Timestamp.now(),
       });
@@ -52,11 +62,12 @@ class _AddStudentPageState extends State<AddStudentPage> {
       UserCredential? credential;
 
       try {
-        credential = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(
+      credential = await secondaryAuth
+          .createUserWithEmailAndPassword(
           email: parentEmail,
-          password: 'Temp@123', // temporary password
+          password: 'Temp@123',
         );
+
       } on FirebaseAuthException catch (e) {
         if (e.code == 'email-already-in-use') {
           // Parent already exists → fetch current user
@@ -134,7 +145,6 @@ class _AddStudentPageState extends State<AddStudentPage> {
     parentPhoneController.dispose();
     parentEmailController.dispose();
     villageController.dispose();
-    busIdController.dispose();
     super.dispose();
   }
 
@@ -175,11 +185,15 @@ class _AddStudentPageState extends State<AddStudentPage> {
                 icon: Icons.location_on,
               ),
 
-              _buildInput(
-                controller: busIdController,
-                label: 'Bus ID / Number',
-                icon: Icons.directions_bus,
-              ),
+              // _buildInput(
+              //   controller: busIdController,
+              //   label: 'Bus ID / Number',
+              //   icon: Icons.directions_bus,
+              // ),
+              _buildBusDropdown(),
+
+
+              
 
               const SizedBox(height: 24),
 
@@ -284,4 +298,56 @@ class _AddStudentPageState extends State<AddStudentPage> {
       ),
     );
   }
+  
+  // ---------------- BUS DROPDOWN ----------------
+  Widget _buildBusDropdown() {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 16),
+    child: StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('buses')
+          .where('isActive', isEqualTo: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const CircularProgressIndicator();
+        }
+
+        final buses = snapshot.data!.docs;
+
+        if (buses.isEmpty) {
+          return const Text('No active buses available');
+        }
+
+        return DropdownButtonFormField<String>(
+          value: selectedBusId,
+          decoration: InputDecoration(
+            labelText: 'Assign Bus',
+            prefixIcon: const Icon(Icons.directions_bus),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          items: buses.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return DropdownMenuItem(
+              value: doc.id, // 🔥 Firestore busId
+              child: Text(data['busNumber']),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() => selectedBusId = value);
+          },
+          validator: (value) {
+            if (value == null) {
+              return 'Please select a bus';
+            }
+            return null;
+          },
+        );
+      },
+    ),
+  );
+}
+
 }

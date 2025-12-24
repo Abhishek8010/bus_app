@@ -130,6 +130,35 @@ class BusDetailsPage extends StatelessWidget {
                   label: 'Assigned Driver',
                   value: 'Not assigned',
                 ),
+
+                const SizedBox(height: 12,),
+                ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/bus-students',
+                        arguments: busId,
+                      );
+                    },
+                    icon: const Icon(Icons.group),
+                    label: const Text('View Students'),
+                  ),
+
+
+                const SizedBox(height: 12),
+
+                ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/assign-driver',
+                        arguments: busId,
+                      );
+                    },
+                    icon: const Icon(Icons.person_add),
+                    label: const Text('Assign Driver'),
+                  ),
+
               ],
             ),
           );
